@@ -4,6 +4,8 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
+
+from tqdm import tqdm
 # initialize parameters(w,b)
 
 
@@ -619,7 +621,9 @@ def L_layer_model(X, Y, layer_dims, learning_rate, num_iterations, optimizer, be
         v, s = initialize_adam(parameters)
     t = 0  # initializing the counter required for Adam update
     seed = 0
-    for i in range(0, num_iterations):
+
+    pbar = tqdm(range(0, num_iterations), desc=f'{optimizer}', total=num_iterations, leave=True)
+    for i in pbar:
         # Define the random minibatches. We increment the seed to reshuffle differently the dataset after each epoch
         seed = seed + 1
         minibatches = random_mini_batches(X, Y, mini_batch_size, seed)
@@ -649,7 +653,8 @@ def L_layer_model(X, Y, layer_dims, learning_rate, num_iterations, optimizer, be
                 parameters = update_parameters_with_adam(parameters, grads, v, s, t, learning_rate, beta, beta2, epsilon)
 
         if i % 100 == 0:
-            print(f"[{optimizer}]Cost after iteration {i:>5}: {cost:.4f}")
+            pbar.set_postfix({'cost' : f'{cost:1.5f}'}) # 输入一个字典，显示实验指标
+            # print(f"[{optimizer}]Cost after iteration {i:>5}: {cost:.4f}")
             costs.append(cost)
 
     return parameters, costs
